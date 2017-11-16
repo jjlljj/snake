@@ -2,9 +2,11 @@ function Game(screenId) {
   var canvas = document.getElementById(screenId);
   var screen = canvas.getContext('2d');
   var gameSize = {x: canvas.width, y: canvas.height};
-  var frameLength = 300;
+  var frameLength = 250;
 
-  this.bodies = [new Snake(this, gameSize)];
+  this.bodies = [new Snake(this, gameSize),new Apple(this, gameSize)];
+  // this.snake = new Snake(this, gameSize);
+  // this.apples = [new Apple(this, gameSize)];
 
   var self = this;
   var tick = function() {
@@ -27,8 +29,14 @@ Game.prototype.update = function() {
 Game.prototype.draw = function(screen, gameSize) {
   screen.clearRect(0, 0, gameSize.x, gameSize.y);
 
-  this.bodies[0].blocks.forEach(function(block) {
-    drawRect(screen, block)
+  this.bodies.forEach(function(body){
+    if (body instanceof Snake) {
+      body.blocks.forEach(function(block) {
+        drawRect(screen, block)
+       });
+    } else {
+      drawRect(screen, body)
+    };
   });
 };
 
@@ -85,11 +93,15 @@ function SnakeBlock(game, center) {
   this.center = center;
 };
 
-function drawRect(screen, body) {
-  screen.fillRect(body.center.x - body.size.x / 2,
-                    body.center.y - body.size.y / 2,
-                    body.size.x, body.size.y);
-};
+function Apple(game, gameSize) {
+  this.game = game;
+  this.size = {x: 15, y: 15};
+  this.center = { x: gameSize.x - (Math.random() * gameSize.x), y: gameSize.y -(Math.random() * gameSize.x) };
+}
+
+Apple.prototype.update = function() {
+
+}
 
 function Keyboarder() {
   var keyState = {};
@@ -104,6 +116,17 @@ function Keyboarder() {
   };
   this.KEYS = {LEFT: 37, UP: 38, RIGHT: 39, DOWN: 40};
 };
+
+
+function drawRect(screen, body) {
+  screen.fillRect(body.center.x - body.size.x / 2,
+                    body.center.y - body.size.y / 2,
+                    body.size.x, body.size.y);
+};
+
+function drawApple(screen, body) {
+  screen.fillRect(body.center.x, body.center.y, body.size.x, body.size.y);
+}
 
 
 
