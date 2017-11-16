@@ -5,8 +5,6 @@ function Game(screenId) {
   var frameLength = 250;
 
   this.bodies = [new Snake(this, gameSize),new Apple(this, gameSize)];
-  // this.snake = new Snake(this, gameSize);
-  // this.apples = [new Apple(this, gameSize)];
 
   var self = this;
   var tick = function() {
@@ -127,6 +125,7 @@ function drawRect(screen, body) {
 function drawApple(screen, body) {
   screen.fillRect(body.center.x, body.center.y, body.size.x, body.size.y);
 }
+
 
 
 
