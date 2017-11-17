@@ -4,7 +4,9 @@ function Game(screenId) {
   var gameSize = {x: canvas.width, y: canvas.height};
   var frameLength = 250;
 
-  this.bodies = [new Snake(this, gameSize),new Apple(this, gameSize)];
+  this.gameSize = gameSize;
+
+  this.bodies = [new Snake(this, gameSize), new Apple(this, gameSize)];
 
   var self = this;
   var tick = function() {
@@ -18,10 +20,24 @@ function Game(screenId) {
 }
 
 Game.prototype.update = function() {
-  var bodies = this.bodies;
+  var bodies = this.bodies
+  var snakeBlocks = this.bodies[0].blocks
+  var apple = this.bodies[1]
+
+  for (var i=0; i<snakeBlocks.length; i++) {
+    if (colliding(snakeBlocks[i], apple)) {
+      this.bodies.pop();
+      this.bodies.push(new Apple(this, this.gameSize));
+      this.bodies[0].appleEaten = true;
+    };
+  };
+
   for (var i = 0; i < this.bodies.length; i++) {
     this.bodies[i].update();
   };
+
+  this.bodies[0].appleEaten = false;
+
 };
 
 Game.prototype.draw = function(screen, gameSize) {
@@ -38,9 +54,11 @@ Game.prototype.draw = function(screen, gameSize) {
   });
 };
 
+
 function Snake(game, gameSize) {
   this.game = game;
   this.blocks = [];
+  this.appleEaten = false;
   this.direction = 'up';
   this.head = {x: gameSize.x / 2, y: gameSize.y / 2};
   this.blocks.push(new SnakeBlock(game, this.head))
@@ -65,19 +83,27 @@ Snake.prototype.update = function() {
    if (this.direction === 'left' && this.head.x > 15) {
     this.head = {x: this.head.x - 15, y: this.head.y}
     this.blocks.unshift(new SnakeBlock(this.game, this.head));
-    this.blocks.pop();
+    if (!this.appleEaten){
+      this.blocks.pop();
+    }
   } else if (this.direction === 'right' && this.head.x < 305) {
     this.head = {x: this.head.x + 15, y: this.head.y}
     this.blocks.unshift(new SnakeBlock(this.game, this.head));
-    this.blocks.pop();
+    if (!this.appleEaten){
+      this.blocks.pop();
+    }
   } else if (this.direction === 'up' && this.head.y > 15) {
     this.head = {x: this.head.x, y: this.head.y - 15}
     this.blocks.unshift(new SnakeBlock(this.game, this.head));
-    this.blocks.pop();
+    if (!this.appleEaten){
+      this.blocks.pop();
+    }
   } else if (this.direction === 'down' && this.head.y < 305) {
     this.head = {x: this.head.x, y: this.head.y + 15}
     this.blocks.unshift(new SnakeBlock(this.game, this.head));
-    this.blocks.pop();
+    if (!this.appleEaten){
+      this.blocks.pop();
+    }
   };
 };
 
@@ -126,6 +152,17 @@ function drawApple(screen, body) {
   screen.fillRect(body.center.x, body.center.y, body.size.x, body.size.y);
 }
 
+function colliding(b1, b2) {
+  return !(b1 === b2 || 
+            b1.center.x + b1.size.x / 2 < b2.center.x - b2.size.x / 2 ||
+            b1.center.y + b1.size.y / 2 < b2.center.y - b2.size.y / 2 ||
+            b1.center.x - b1.size.x / 2 > b2.center.x + b2.size.x / 2 ||
+            b1.center.y - b1.size.y / 2 > b2.center.y + b2.size.y / 2 );
+};
+
+function gameOverAlert() {
+  alert('game over');
+}
 
 
 
