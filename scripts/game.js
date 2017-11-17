@@ -40,6 +40,10 @@ Game.prototype.update = function() {
     };
   };
 
+  if (this.bodies[0].hitWall()) {
+    this.loseGame();
+  }
+
   for (var i = 0; i < this.bodies.length; i++) {
     this.bodies[i].update();
   };
@@ -63,10 +67,10 @@ Game.prototype.draw = function(screen, gameSize) {
 
 Game.prototype.loseGame = function() {
   console.log('whoops!')
+  alert('you lose')
   this.game0ver = true;
   clearInterval(this.tick)
 }
-
 
 function Snake(game, gameSize) {
   this.game = game;
@@ -78,14 +82,20 @@ function Snake(game, gameSize) {
   this.keyboarder = new Keyboarder();
 };
 
+Snake.prototype.hitWall = function() {
+  if ( this.head.x < 15 || this.head.x > 305 || this.head.y < 15 || this.head.y > 305) {
+    return true;
+  } 
+}
+
 Snake.prototype.setDirection = function() {
-  if (this.keyboarder.isDown(this.keyboarder.KEYS.LEFT) && this.head.x > 15) {
+  if (this.keyboarder.isDown(this.keyboarder.KEYS.LEFT) && this.direction !== 'right') {
     this.direction = 'left';
-  } else if (this.keyboarder.isDown(this.keyboarder.KEYS.RIGHT) && this.head.x < 305) {
+  } else if (this.keyboarder.isDown(this.keyboarder.KEYS.RIGHT ) && this.direction !== 'left') {
     this.direction = 'right';
-  } else if (this.keyboarder.isDown(this.keyboarder.KEYS.UP) && this.head.y > 15) {
+  } else if (this.keyboarder.isDown(this.keyboarder.KEYS.UP) && this.direction !== 'down') {
     this.direction = 'up';
-  } else if (this.keyboarder.isDown(this.keyboarder.KEYS.DOWN) && this.head.y < 305) {
+  } else if (this.keyboarder.isDown(this.keyboarder.KEYS.DOWN) && this.direction !== 'up') {
     this.direction = 'down';
   };
 };
@@ -166,8 +176,6 @@ function colliding(b1, b2) {
             b1.center.x - b1.size.x / 2 >= b2.center.x + b2.size.x / 2 ||
             b1.center.y - b1.size.y / 2 >= b2.center.y + b2.size.y / 2 );
 };
-
-
 
 function gameOverAlert() {
   alert('game over');
