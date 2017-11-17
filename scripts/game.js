@@ -13,7 +13,6 @@ function Game(screenId) {
     self.update();
     self.draw(screen, gameSize);
   }, frameLength);
-
 }
 
 Game.prototype.update = function() {
@@ -74,16 +73,15 @@ Game.prototype.loseGame = function() {
 
 function Snake(game, gameSize) {
   this.game = game;
-  this.blocks = [];
+  this.head = {x: gameSize.x / 2, y: gameSize.y / 2};
+  this.blocks = [new SnakeBlock(game, this.head), new SnakeBlock(game, {x: this.head.x, y: this.head.y + 15})];
   this.appleEaten = false;
   this.direction = 'up';
-  this.head = {x: gameSize.x / 2, y: gameSize.y / 2};
-  this.blocks.push(new SnakeBlock(game, this.head))
   this.keyboarder = new Keyboarder();
 };
 
 Snake.prototype.hitWall = function() {
-  if ( this.head.x < 15 || this.head.x > 305 || this.head.y < 15 || this.head.y > 305) {
+  if ( this.head.x < 0 || this.head.x > 320 || this.head.y < 0 || this.head.y > 320) {
     return true;
   } 
 }
@@ -103,16 +101,16 @@ Snake.prototype.setDirection = function() {
 Snake.prototype.update = function() {
   this.setDirection();
 
-   if (this.direction === 'left' && this.head.x > 15) {
+   if (this.direction === 'left') {
     this.head = {x: this.head.x - 15, y: this.head.y};
     this.slither();
-  } else if (this.direction === 'right' && this.head.x < 305) {
+  } else if (this.direction === 'right') {
     this.head = {x: this.head.x + 15, y: this.head.y};
     this.slither();
-  } else if (this.direction === 'up' && this.head.y > 15) {
+  } else if (this.direction === 'up') {
     this.head = {x: this.head.x, y: this.head.y - 15};
     this.slither();
-  } else if (this.direction === 'down' && this.head.y < 305) {
+  } else if (this.direction === 'down') {
     this.head = {x: this.head.x, y: this.head.y + 15};
     this.slither();
   };
