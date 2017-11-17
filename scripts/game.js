@@ -3,20 +3,17 @@ function Game(screenId) {
   var screen = canvas.getContext('2d');
   var gameSize = {x: canvas.width, y: canvas.height};
   var frameLength = 250;
+  this.game0ver = false;
 
   this.gameSize = gameSize;
-
   this.bodies = [new Snake(this, gameSize), new Apple(this, gameSize)];
 
   var self = this;
-  var tick = function() {
-    setInterval(function() {
+  this.tick = setInterval(function() {
     self.update();
     self.draw(screen, gameSize);
-    }, frameLength);
-  };
+  }, frameLength);
 
-  tick();  
 }
 
 Game.prototype.update = function() {
@@ -24,7 +21,18 @@ Game.prototype.update = function() {
   var snakeBlocks = this.bodies[0].blocks
   var apple = this.bodies[1]
 
+  function hitSelf(block) {
+    for (var i=0; i<snakeBlocks.length; i++) {
+      if (colliding(block, snakeBlocks[i])){
+        return true;
+      };
+    };
+  };
+
   for (var i=0; i<snakeBlocks.length; i++) {
+    if (hitSelf(snakeBlocks[i])) {
+      this.loseGame();
+    }
     if (colliding(snakeBlocks[i], apple)) {
       this.bodies.pop();
       this.bodies.push(new Apple(this, this.gameSize));
@@ -37,7 +45,6 @@ Game.prototype.update = function() {
   };
 
   this.bodies[0].appleEaten = false;
-
 };
 
 Game.prototype.draw = function(screen, gameSize) {
@@ -53,6 +60,12 @@ Game.prototype.draw = function(screen, gameSize) {
     };
   });
 };
+
+Game.prototype.loseGame = function() {
+  console.log('whoops!')
+  this.game0ver = true;
+  clearInterval(this.tick)
+}
 
 
 function Snake(game, gameSize) {
@@ -81,30 +94,25 @@ Snake.prototype.update = function() {
   this.setDirection();
 
    if (this.direction === 'left' && this.head.x > 15) {
-    this.head = {x: this.head.x - 15, y: this.head.y}
-    this.blocks.unshift(new SnakeBlock(this.game, this.head));
-    if (!this.appleEaten){
-      this.blocks.pop();
-    }
+    this.head = {x: this.head.x - 15, y: this.head.y};
+    this.slither();
   } else if (this.direction === 'right' && this.head.x < 305) {
-    this.head = {x: this.head.x + 15, y: this.head.y}
-    this.blocks.unshift(new SnakeBlock(this.game, this.head));
-    if (!this.appleEaten){
-      this.blocks.pop();
-    }
+    this.head = {x: this.head.x + 15, y: this.head.y};
+    this.slither();
   } else if (this.direction === 'up' && this.head.y > 15) {
-    this.head = {x: this.head.x, y: this.head.y - 15}
-    this.blocks.unshift(new SnakeBlock(this.game, this.head));
-    if (!this.appleEaten){
-      this.blocks.pop();
-    }
+    this.head = {x: this.head.x, y: this.head.y - 15};
+    this.slither();
   } else if (this.direction === 'down' && this.head.y < 305) {
-    this.head = {x: this.head.x, y: this.head.y + 15}
-    this.blocks.unshift(new SnakeBlock(this.game, this.head));
+    this.head = {x: this.head.x, y: this.head.y + 15};
+    this.slither();
+  };
+};
+
+Snake.prototype.slither = function() {
+  this.blocks.unshift(new SnakeBlock(this.game, this.head));
     if (!this.appleEaten){
       this.blocks.pop();
-    }
-  };
+    };
 };
 
 Snake.prototype.addBlock = function(block) {
@@ -141,7 +149,6 @@ function Keyboarder() {
   this.KEYS = {LEFT: 37, UP: 38, RIGHT: 39, DOWN: 40};
 };
 
-
 function drawRect(screen, body) {
   screen.fillRect(body.center.x - body.size.x / 2,
                     body.center.y - body.size.y / 2,
@@ -154,17 +161,17 @@ function drawApple(screen, body) {
 
 function colliding(b1, b2) {
   return !(b1 === b2 || 
-            b1.center.x + b1.size.x / 2 < b2.center.x - b2.size.x / 2 ||
-            b1.center.y + b1.size.y / 2 < b2.center.y - b2.size.y / 2 ||
-            b1.center.x - b1.size.x / 2 > b2.center.x + b2.size.x / 2 ||
-            b1.center.y - b1.size.y / 2 > b2.center.y + b2.size.y / 2 );
+            b1.center.x + b1.size.x / 2 <= b2.center.x - b2.size.x / 2 ||
+            b1.center.y + b1.size.y / 2 <= b2.center.y - b2.size.y / 2 ||
+            b1.center.x - b1.size.x / 2 >= b2.center.x + b2.size.x / 2 ||
+            b1.center.y - b1.size.y / 2 >= b2.center.y + b2.size.y / 2 );
 };
+
+
 
 function gameOverAlert() {
   alert('game over');
 }
-
-
 
 window.onload = function() {
   new Game('screen');
