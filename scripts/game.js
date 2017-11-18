@@ -43,9 +43,7 @@ Game.prototype.update = function() {
     this.loseGame();
   }
 
-  for (var i = 0; i < this.bodies.length; i++) {
-    this.bodies[i].update();
-  };
+  this.bodies[0].update()
 
   this.bodies[0].appleEaten = false;
 };
@@ -66,7 +64,7 @@ Game.prototype.draw = function(screen, gameSize) {
 
 Game.prototype.loseGame = function() {
   console.log('whoops!')
-  alert('you lose')
+  console.log('game over')
   this.game0ver = true;
   clearInterval(this.tick)
 }
@@ -75,9 +73,9 @@ function Snake(game, gameSize) {
   this.game = game;
   this.head = {x: gameSize.x / 2, y: gameSize.y / 2};
   this.blocks = [new SnakeBlock(game, this.head), new SnakeBlock(game, {x: this.head.x, y: this.head.y + 15})];
-  this.appleEaten = false;
-  this.direction = 'up';
   this.keyboarder = new Keyboarder();
+  this.direction = this.setDirection() || 'up';
+  this.appleEaten = false;
 };
 
 Snake.prototype.hitWall = function() {
@@ -137,10 +135,6 @@ function Apple(game, gameSize) {
   this.game = game;
   this.size = {x: 15, y: 15};
   this.center = { x: gameSize.x - (Math.random() * gameSize.x), y: gameSize.y -(Math.random() * gameSize.x) };
-}
-
-Apple.prototype.update = function() {
-
 }
 
 function Keyboarder() {
